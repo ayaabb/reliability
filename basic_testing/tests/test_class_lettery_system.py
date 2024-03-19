@@ -1,6 +1,6 @@
 import random
 import unittest
-import src.class_lottery_system as ls
+import basic_testing.src.class_lottery_system as ls
 
 unittest.TestLoader.sortTestMethodsUsing = None
 
