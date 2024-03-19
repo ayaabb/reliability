@@ -19,8 +19,6 @@ class Test_class_lottery_system(unittest.TestCase):
                 self.assertFalse(lottery.sell_ticket(self.names[i]))
         self.assertEqual(lottery.number_of_sold_tickets, len(lottery.people))
         self.assertEqual(lottery.total_earnings, lottery.price_per_ticket * len(lottery.people))
-        # print(
-        #     f"this is people {lottery.people} !!!!!!!!!!!!!!!!! {lottery.max_people} {len(lottery.people)}")
         self.assertTrue(lottery.sell_ticket(random.choice(list(lottery.people.keys()))))
         print("\n")
 
