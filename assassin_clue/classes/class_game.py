@@ -1,5 +1,5 @@
-from classes.class_player import *
-from classes.class_player_exception import *
+from .class_player_exception import *
+from .class_player import *
 
 
 class Game:
@@ -20,37 +20,35 @@ class Game:
         """
         choosing a victim from alive players list to murder based on a random place that the murderer and the player
         in it ,deletes it from alive players prints the murder details (place,weapon,victim)"""
-        invalid_places = []
-        murder_place = self.choose_murder_place(invalid_places)
+
+        murder_place = self.choose_murder_place()
         victim = self.choose_victim(murder_place)
 
         while victim is None:
-            try:
-                invalid_places.append(murder_place)
-                murder_place = self.choose_murder_place(invalid_places)
-                victim = self.choose_victim(murder_place)
-                if len(invalid_places) == len(self.murderer.last_visited_places):
+
+                self.murderer.last_visited_places.remove(murder_place)
+                if len(self.murderer.last_visited_places) == 0:
                     raise NoPlayersInMurderPlaceError("No players in the murder place.")
-            except NoPlayersInMurderPlaceError as e:
-                print(e)
-                return None
+
+                murder_place = self.choose_murder_place()
+                victim = self.choose_victim(murder_place)
 
         print(f"Murder Details:")
         print(f"Place: {murder_place}")
         print(f"Weapon: {random.choice(self.murderer.fav_weapons)}")
         print(f"Murdered Player: {victim.name}\n")
         self.alive_players.remove(victim)
+        return True
 
-    def choose_murder_place(self, invalid_places):
+    def choose_murder_place(self):
         murder_place = random.choice(self.murderer.last_visited_places)
-        while murder_place in invalid_places:
-            murder_place = random.choice(self.murderer.last_visited_places)
         return murder_place
 
     def choose_victim(self, murder_place):
         """Choose a player from alive players list to be victim."""
-        players_in_murder_place = [player for player in self.alive_players if murder_place in player.last_visited_places]
-        if not players_in_murder_place:
+        players_in_murder_place = [player for player in self.alive_players if
+                                   murder_place in player.last_visited_places and player != self.murderer]
+        if len(players_in_murder_place) == 0:
             return None
         return random.choice(players_in_murder_place)
 
@@ -97,12 +95,12 @@ class Game:
         returns: the accused player"""
 
         print(f"Suspected Player 1: {suspected_player1[0].name}")
-        print(f"Visited Places: {', '.join(suspected_player1[1])}")
-        print(f"Favorite Weapon: {suspected_player1[2]}")
+        print(f"Visited Places: {', '.join(suspected_player1[1][0])}")
+        print(f"Favorite Weapon: {suspected_player1[1][1]}")
         print("\n")
         print(f"Suspected Player 2: {suspected_player2[0].name}")
-        print(f"Visited Places: {', '.join(suspected_player2[1])}")
-        print(f"Favorite Weapon: {suspected_player2[2]}")
+        print(f"Visited Places: {', '.join(suspected_player2[1][0])}")
+        print(f"Favorite Weapon: {suspected_player2[1][1]}")
         print("\n")
         invalid_choice = True
         while invalid_choice:
@@ -122,35 +120,62 @@ class Game:
             return suspected_player2[0]
 
     def play_round(self):
+        """Simulates a game round, allowing players to visit places and handle murder accusations.
+
+        Iterates over each alive player, allowing them to visit places. Checks if a murder has occurred.
+        If so, prompts user player to suspect and accuse players . Returns 'Game Over' if the accused
+        player is the murderer, 'no murder' if no murder occurred, or 'continue' to indicate the game
+        should proceed.
+
+        Returns:
+            str: 'Game Over', 'no murder', or 'continue'.
+        """
 
         for player in self.alive_players:
             player.visit_places(self.places)
         try:
-            if self.murder() is not None:
+            murder = self.murder()
+            if murder:
+                if len(self.alive_players) == 1:
+                    return "end"
                 suspected_player1, suspected_player2 = self.suspect_2_players()
                 accused_player = self.accuse_player(suspected_player1, suspected_player2)
                 if self.check_murderer(accused_player):
                     return 'Game Over'
 
-            else:
-                raise TypeError("There is no murder,let's try one more round\n")
-
-        except TypeError as e:
+        except NoPlayersInMurderPlaceError as e:
             print(e)
             return "no murder"
+
         return "continue"
 
     def Start(self):
-        round=1
-        try:
-            while len(self.alive_players) > 2:
-                print(f"Round {round}:")
-                if self.play_round() == 'Game Over':
-                    raise StopIteration(f"Game Over!! '{self.murderer.name}' is the murderer")
+        """Starts the game simulation.
 
-                if len(self.alive_players) == 2:
-                    raise StopIteration(f"The game ended and the winner is the murderer '{self.murderer.name}'")
-                round+=1
+         Initiates the game simulation by running rounds until there are only two players and one of them the murderer.
+         Each round is played using the play_round method. If only two players remained the game will end
+          and the murderer is the winner.If the play_round returns a Game Over message the game ends with game over message.
+         """
+        round = 1
+        try:
+            while len(self.alive_players) > 1:
+                print(f"Round {round}:")
+                round_status = self.play_round()
+                if round_status == 'Game Over':
+                    raise StopIteration(f"Game Over!! Your accusation is correct and '{self.murderer.name}' is the murderer")
+                elif round_status == 'continue':
+                    print("Your accusation is incorrect, the game continues")
+                elif round_status == "no murder":
+                    print("let's try one more round")
+                else:
+                    print(f"The game has ended and the winner is the murderer '{self.murderer.name}'")
+                    break
+                round += 1
+                print("\n")
         except StopIteration as e:
             print(e)
-            return
+
+
+
+
+
