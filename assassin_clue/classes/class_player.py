@@ -18,4 +18,4 @@ class player:
         # Choose 2 random places and 1 weapon for each suspected player
         places = random.sample(self.last_visited_places, min(len(self.last_visited_places), 2))
         weapon = random.choice(self.fav_weapons)
-        return places, weapon
+        return [places, weapon]

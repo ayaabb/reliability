@@ -1,6 +1,6 @@
-
 import json
 import os
+
 
 def load_json_files(directory):
     """Load data from a set of JSON files in the specified directory."""
@@ -17,9 +17,8 @@ def load_json_files(directory):
     return all_data
 
 
-def merge_data(data,key):
+def merge_data(data, key):
     merged_data = []
     for data_list in data:
         merged_data = merged_data + data_list[key]
     return merged_data
-
