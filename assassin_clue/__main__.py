@@ -1,6 +1,3 @@
-import os
-import sys
-
 from utils.save_docstring import save_class_docstrings
 from classes.class_game import Game
 from players_init import get_players
@@ -23,4 +20,4 @@ def save_docstring_to_file(class_, output_file_path):
 
 if __name__ == "__main__":
     save_docstring_to_file(Game, 'docstring_file.txt')
-    # main()
+    main()
