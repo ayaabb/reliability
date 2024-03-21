@@ -1,5 +1,8 @@
+import random
+
 from .class_player_exception import *
 from .class_player import *
+
 
 
 class Game:
@@ -9,29 +12,41 @@ class Game:
         self.murderer = None
 
     def initialize_game(self):
-        """Initialize the game state."""
+        """
+         Initializes the game state by calling method that selects the murderer from the list of alive players.
+         No parameters.
+         Returns: None
+        """
         self.select_murderer()
 
     def select_murderer(self):
-        """the function chooses a murderer from the players list and save it on game variables"""
+        """
+          Chooses a murderer from the list of alive players and saves it in the game variables.
+          No parameters.
+          Returns:None
+          """
         self.murderer = random.choice(self.alive_players)
 
     def murder(self):
         """
-        choosing a victim from alive players list to murder based on a random place that the murderer and the player
-        in it ,deletes it from alive players prints the murder details (place,weapon,victim)"""
+        Chooses a victim from the list of alive players and murder him
+        based on a random place of the murderer last visited places.
+        Deletes the victim from the list of alive players and prints the murder details.
+        No parameters.
+        Returns: bool: True if murder is successful, False raises No Players In Murder Place Error.
+        """
 
         murder_place = self.choose_murder_place()
         victim = self.choose_victim(murder_place)
 
         while victim is None:
 
-                self.murderer.last_visited_places.remove(murder_place)
-                if len(self.murderer.last_visited_places) == 0:
-                    raise NoPlayersInMurderPlaceError("No players in the murder place.")
+            self.murderer.last_visited_places.remove(murder_place)
+            if len(self.murderer.last_visited_places) == 0:
+                raise NoPlayersInMurderPlaceError("No players in the murder place.")
 
-                murder_place = self.choose_murder_place()
-                victim = self.choose_victim(murder_place)
+            murder_place = self.choose_murder_place()
+            victim = self.choose_victim(murder_place)
 
         print(f"Murder Details:")
         print(f"Place: {murder_place}")
@@ -41,11 +56,20 @@ class Game:
         return True
 
     def choose_murder_place(self):
+        """
+            Chooses a murder place randomly from the last visited places of the murderer.
+            No parameters.
+            Returns: str: The chosen murder place.
+        """
         murder_place = random.choice(self.murderer.last_visited_places)
         return murder_place
 
     def choose_victim(self, murder_place):
-        """Choose a player from alive players list to be victim."""
+        """
+        Chooses a victim from the list of alive players based on the murder place.
+        Parameters: murder_place (str): The murder place.
+        Returns:  Player or None: The chosen victim if found, None otherwise.
+        """
         players_in_murder_place = [player for player in self.alive_players if
                                    murder_place in player.last_visited_places and player != self.murderer]
         if len(players_in_murder_place) == 0:
@@ -53,16 +77,17 @@ class Game:
         return random.choice(players_in_murder_place)
 
     def check_murderer(self, accused_player):
-        """param: accused player
-                the function checks if this accused player is the murderer
-                returns: True or False
-                """
+        """
+        Checks if the accused player is the murderer.
+        Parameters: accused_player (Player)
+        Returns: bool: True if the accused player is the murderer, False otherwise.
+        """
         return accused_player == self.murderer
 
     def suspect_2_players(self):
-        """the function prints all alive players and asks the user player to choose
-        2 players to suspect, and then suspect them by choosing 2 random places and 1 gun
-         returns: [player1,2 places,1 gun],[player2,2 places,1 gun]
+        """
+        Allows the user to suspect two players and choosing random places and weapons of them.
+        Returns:  A list containing information about the suspected players, places, and weapons.
         """
         print("These are the alive players:")
         for i in range(len(self.alive_players)):
@@ -89,10 +114,11 @@ class Game:
 
     def accuse_player(self, suspected_player1, suspected_player2):
         """
-         param: 2 suspected players and their 2 random places they visited and a weapon
-          the function asks from the user player to accuse one of them based on 2 last places
-          that they visited and a weapon
-        returns: the accused player"""
+            Allows the user to accuse one of the suspected players based on their visited places and weapons.
+            Parameters: suspected_player1 (nested list): Information about the first suspected player,
+            suspected_player2 (nested list): Information about the second suspected player.
+            Returns: Player: The accused player.
+        """
 
         print(f"Suspected Player 1: {suspected_player1[0].name}")
         print(f"Visited Places: {', '.join(suspected_player1[1][0])}")
@@ -121,14 +147,11 @@ class Game:
 
     def play_round(self):
         """Simulates a game round, allowing players to visit places and handle murder accusations.
-
         Iterates over each alive player, allowing them to visit places. Checks if a murder has occurred.
         If so, prompts user player to suspect and accuse players . Returns 'Game Over' if the accused
         player is the murderer, 'no murder' if no murder occurred, or 'continue' to indicate the game
         should proceed.
-
-        Returns:
-            str: 'Game Over', 'no murder', or 'continue'.
+        Returns: str: 'Game Over', 'no murder', or 'continue'.
         """
 
         for player in self.alive_players:
@@ -151,7 +174,6 @@ class Game:
 
     def Start(self):
         """Starts the game simulation.
-
          Initiates the game simulation by running rounds until there are only two players and one of them the murderer.
          Each round is played using the play_round method. If only two players remained the game will end
           and the murderer is the winner.If the play_round returns a Game Over message the game ends with game over message.
@@ -162,7 +184,8 @@ class Game:
                 print(f"Round {round}:")
                 round_status = self.play_round()
                 if round_status == 'Game Over':
-                    raise StopIteration(f"Game Over!! Your accusation is correct and '{self.murderer.name}' is the murderer")
+                    raise StopIteration(
+                        f"Game Over!! Your accusation is correct and '{self.murderer.name}' is the murderer")
                 elif round_status == 'continue':
                     print("Your accusation is incorrect, the game continues")
                 elif round_status == "no murder":
@@ -174,8 +197,3 @@ class Game:
                 print("\n")
         except StopIteration as e:
             print(e)
-
-
-
-
-

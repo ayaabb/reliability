@@ -1,0 +1,58 @@
+Class: Game
+
+Start Method: 
+Starts the game simulation.
+Initiates the game simulation by running rounds until there are only two players and one of them the murderer.
+Each round is played using the play_round method. If only two players remained the game will end
+ and the murderer is the winner.If the play_round returns a Game Over message the game ends with game over message.
+
+accuse_player Method: 
+Allows the user to accuse one of the suspected players based on their visited places and weapons.
+Parameters: suspected_player1 (nested list): Information about the first suspected player,
+suspected_player2 (nested list): Information about the second suspected player.
+Returns: Player: The accused player.
+
+check_murderer Method: 
+Checks if the accused player is the murderer.
+Parameters: accused_player (Player)
+Returns: bool: True if the accused player is the murderer, False otherwise.
+
+choose_murder_place Method: 
+Chooses a murder place randomly from the last visited places of the murderer.
+No parameters.
+Returns: str: The chosen murder place.
+
+choose_victim Method: 
+Chooses a victim from the list of alive players based on the murder place.
+Parameters: murder_place (str): The murder place.
+Returns:  Player or None: The chosen victim if found, None otherwise.
+
+initialize_game Method: 
+Initializes the game state by calling method that selects the murderer from the list of alive players.
+No parameters.
+Returns: None
+
+murder Method: 
+Chooses a victim from the list of alive players and murder him
+based on a random place of the murderer last visited places.
+Deletes the victim from the list of alive players and prints the murder details.
+No parameters.
+Returns: bool: True if murder is successful, False raises No Players In Murder Place Error.
+
+play_round Method: 
+Simulates a game round, allowing players to visit places and handle murder accusations.
+Iterates over each alive player, allowing them to visit places. Checks if a murder has occurred.
+If so, prompts user player to suspect and accuse players . Returns 'Game Over' if the accused
+player is the murderer, 'no murder' if no murder occurred, or 'continue' to indicate the game
+should proceed.
+Returns: str: 'Game Over', 'no murder', or 'continue'.
+
+select_murderer Method: 
+Chooses a murderer from the list of alive players and saves it in the game variables.
+No parameters.
+Returns:None
+
+suspect_2_players Method: 
+Allows the user to suspect two players and choosing random places and weapons of them.
+Returns:  A list containing information about the suspected players, places, and weapons.
+
