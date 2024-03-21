@@ -1,8 +1,7 @@
 import random
 
-from .class_player_exception import *
+from .class_murder_exception import *
 from .class_player import *
-
 
 
 class Game:
@@ -33,7 +32,7 @@ class Game:
         based on a random place of the murderer last visited places.
         Deletes the victim from the list of alive players and prints the murder details.
         No parameters.
-        Returns: bool: True if murder is successful, False raises No Players In Murder Place Error.
+        Returns: bool: True if murder is successful, False raises No players in the murderer's last visited places Error.
         """
 
         murder_place = self.choose_murder_place()
@@ -43,7 +42,7 @@ class Game:
 
             self.murderer.last_visited_places.remove(murder_place)
             if len(self.murderer.last_visited_places) == 0:
-                raise NoPlayersInMurderPlaceError("No players in the murder place.")
+                raise NoPlayersInMurdererPlacesError("No players in the murderer's last visited places.")
 
             murder_place = self.choose_murder_place()
             victim = self.choose_victim(murder_place)
@@ -166,7 +165,7 @@ class Game:
                 if self.check_murderer(accused_player):
                     return 'Game Over'
 
-        except NoPlayersInMurderPlaceError as e:
+        except NoPlayersInMurdererPlacesError as e:
             print(e)
             return "no murder"
 
@@ -179,21 +178,19 @@ class Game:
           and the murderer is the winner.If the play_round returns a Game Over message the game ends with game over message.
          """
         round = 1
-        try:
-            while len(self.alive_players) > 1:
-                print(f"Round {round}:")
-                round_status = self.play_round()
-                if round_status == 'Game Over':
-                    raise StopIteration(
-                        f"Game Over!! Your accusation is correct and '{self.murderer.name}' is the murderer")
-                elif round_status == 'continue':
-                    print("Your accusation is incorrect, the game continues")
-                elif round_status == "no murder":
-                    print("let's try one more round")
-                else:
-                    print(f"The game has ended and the winner is the murderer '{self.murderer.name}'")
-                    break
-                round += 1
-                print("\n")
-        except StopIteration as e:
-            print(e)
+        game_over = False
+        while len(self.alive_players) > 1 and not game_over:
+            print(f"Round {round}:")
+            round_status = self.play_round()
+            if round_status == 'Game Over':
+                print(f"Game Over!! Your accusation is correct and '{self.murderer.name}' is the murderer")
+                game_over = True
+            elif round_status == 'continue':
+                print("Your accusation is incorrect, the game continues")
+            elif round_status == "no murder":
+                print("let's try one more round")
+            else:
+                print(f"The game has ended and the winner is the murderer '{self.murderer.name}'")
+                game_over = True
+            round += 1
+            print("\n")

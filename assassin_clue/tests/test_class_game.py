@@ -1,13 +1,17 @@
 import unittest
-from assassin_clue.classes.class_game import *
-from assassin_clue.classes.class_player_exception import NoPlayersInMurderPlaceError
-from assassin_clue.players_init import get_players
+from unittest.mock import patch
+
+from classes.class_game import *
+from classes.class_murder_exception import NoPlayersInMurdererPlacesError
+from players_init import get_players
+
+weapons = ["w1", "w2", "w3", "w4", "w5"]
 
 
 class TestGame(unittest.TestCase):
     def test_select_murderer(self):
         alive_players = ["Player1", "Player2", "Player3"]
-        weapons = ["w1", "w2", "w3"]
+
         alive_players = get_players(alive_players, weapons)
         places = ["Library", "Kitchen", "Garden", "Study", "Hall", "Dining Room"]
         game = Game(alive_players, places)
@@ -16,7 +20,6 @@ class TestGame(unittest.TestCase):
 
     def test_choose_murder_place(self):
         alive_players = ["Player1", "Player2", "Player3"]
-        weapons = ["w1", "w2", "w3"]
         alive_players = get_players(alive_players, weapons)
         places = ["Library", "Kitchen", "Garden", "Study", "Hall", "Dining Room"]
         game = Game(alive_players, places)
@@ -27,7 +30,6 @@ class TestGame(unittest.TestCase):
 
     def test_choose_victim(self):
         alive_players = ["Player1", "Player2", "Player3"]
-        weapons = ["w1", "w2", "w3"]
         alive_players = get_players(alive_players, weapons)
         places = ["Library", "Kitchen", "Garden", "Study", "Hall", "Dining Room"]
         game = Game(alive_players, places)
@@ -35,30 +37,29 @@ class TestGame(unittest.TestCase):
         game.murderer.last_visited_places = ["Library", "Garden"]
         victim = game.choose_victim("Library")
         self.assertIsNone(victim)
-        game.alive_players[1].laslast_visited_places = ["Library"]
+        game.alive_players[1].last_visited_places = ["Library"]
         victim = game.choose_victim("Library")
         self.assertIsNot(victim, game.murderer)
         self.assertTrue(victim, game.alive_players[1])
 
-    def test_play_round(self):
-        alive_players = ["Player1", "Player2", "Player3"]
-        weapons = ["w1", "w2", "w3"]
+
+    def test_murder_with_no_players_in_murder_place(self):
+        alive_players = ["Player1"]
         alive_players = get_players(alive_players, weapons)
         places = ["Library", "Kitchen", "Garden", "Study", "Hall", "Dining Room"]
+
         game = Game(alive_players, places)
         game.initialize_game()
-        result = game.play_round()
-        self.assertIn(result, ['Game Over', 'no murder', 'continue'])
-        if result == 'continue':
-           self.assertTrue(len(game.alive_players) == 2)
+        game.murderer.visit_places(game.places)
+        with self.assertRaises(NoPlayersInMurdererPlacesError):
+            game.murder()
 
-
-    def test_play_round_with_no_players_in_murder_place(self):
+    def test_play_round_with_no_murder(self):
         alive_players = ["Player1"]
-        weapons = ["w1", "w2", "w3"]
         alive_players = get_players(alive_players, weapons)
         places = ["Library", "Kitchen", "Garden", "Study", "Hall", "Dining Room"]
-        game = Game(alive_players, places)
 
-        with self.assertRaises(NoPlayersInMurderPlaceError):
-            game.play_round()
+        game = Game(alive_players, places)
+        game.initialize_game()
+        status = game.play_round()
+        self.assertTrue(status=='no murder')
