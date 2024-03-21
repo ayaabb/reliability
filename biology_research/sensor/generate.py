@@ -1,11 +1,10 @@
 from datetime import datetime
 import random
-# from modify_file.write_to_file import*
+from  .write_to_file import write_to_file
 
-from modify_file import write_to_file
+min_rand = 10
+max_rand = 99
 
-min_rand=10
-max_rand=99
 
 def generate_record():
     num_deaths = random.randint(min_rand, max_rand)
