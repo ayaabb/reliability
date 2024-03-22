@@ -1,2 +1,2 @@
 from .generate import *
-from .write_to_file import *
+from .store_record import *
