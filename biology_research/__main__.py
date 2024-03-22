@@ -1,7 +1,7 @@
 import multiprocessing
 import sys
-from run_backend import *
-from run_sensor import *
+from backend.run_backend import *
+from sensor.run_sensor import *
 
 
 def main(file_path):
